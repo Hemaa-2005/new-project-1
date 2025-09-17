@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChatGPT API Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #chat {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .message {
+      margin: 5px 0;
+    }
+    .user {
+      color: blue;
+    }
+    .bot {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>ChatGPT API Demo</h1>
+  <div id="chat"></div>
+  <input type="text" id="prompt" placeholder="Type your message here..." size="50"/>
+  <button id="sendBtn">Send</button>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const promptInput = document.getElementById('prompt');
+    const sendBtn = document.getElementById('sendBtn');
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    async function sendMessage() {
+      const userMessage = promptInput.value.trim();
+      if (!userMessage) return;
+
+      addMessage('You: ' + userMessage, 'user');
+      promptInput.value = '';
+
+      // Call your backend which hits the OpenAI API
+      try {
+        const response = await fetch('/chatgpt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: userMessage })
+        });
+        const data = await response.json();
+        if (data && data.reply) {
+          addMessage('Bot: ' + data.reply, 'bot');
+        } else {
+          addMessage('Bot: (no response)', 'bot');
+        }
+      } catch (err) {
+        console.error(err);
+        addMessage('Error communicating with server', 'bot');
+      }
+    }
+
+    function addMessage(text, cls) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      div.className = 'message ' + cls;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
